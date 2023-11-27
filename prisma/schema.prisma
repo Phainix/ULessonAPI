@@ -1,0 +1,106 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @unique
+  email String @unique
+  name  String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  notes      Note[]
+  UserLesson UserLesson[]
+
+  @@map("user")
+}
+
+model Lesson {
+  id          String @unique
+  title       String
+  description String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  notes      Note[]
+  quizes     Quiz[]
+  UserLesson UserLesson[]
+
+  @@map("lesson")
+}
+
+model Note {
+  id   String @unique
+  note String
+  time String
+
+  lessonId String @map("lesson_id")
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userId   String @map("user_id")
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("note")
+}
+
+model Quiz {
+  id       String @unique
+  question String
+  optionA  String @map("option_a")
+  optionB  String @map("option_b")
+  optionC  String @map("option_c")
+  optionD  String @map("option_d")
+  answer   String
+
+  lessonId String @map("lesson_id")
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  userQuizes UserQuiz[]
+
+  @@map("quiz")
+}
+
+model UserQuiz {
+  id     String @unique
+  answer String
+
+  userLessonId String     @map("user_lesson_id")
+  userLesson   UserLesson @relation(fields: [userLessonId], references: [id], onDelete: Cascade)
+  quizId       String     @map("quiz_id")
+  quiz         Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("user_quiz")
+}
+
+model UserLesson {
+  id        String @unique
+  quizScore Int    @map("quiz_score")
+
+  lessonId String @map("lesson_id")
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userId   String @map("user_id")
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  userQuizes UserQuiz[]
+
+  @@map("user_lesson")
+}
