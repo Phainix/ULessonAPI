@@ -27,7 +27,7 @@ export class UserApplicationService {
       );
     }
 
-    let jwtSecretKey = this.configService.get<string>('JWT_SECRET_KEY', '');
+    const jwtSecretKey = this.configService.get<string>('JWT_SECRET_KEY', '');
     const idToken = sign(
       { email: user.email, id: user.id, name: user.name },
       jwtSecretKey,
@@ -36,6 +36,7 @@ export class UserApplicationService {
     return new UserViewModel({
       idToken,
       email: user.email,
+      id: user.id,
     });
   }
 }

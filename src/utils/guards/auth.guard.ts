@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate {
       );
     }
 
-    let jwtSecretKey = process.env.JWT_SECRET_KEY;
+    const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
     const verified = verify(idToken, jwtSecretKey);
     if (verified) {
